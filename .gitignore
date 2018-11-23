@@ -1,0 +1,6 @@
+# JetBrains software
+.idea/
+*.iml
+
+# Compile results
+target/
