@@ -16,9 +16,9 @@ public class TransferController extends AbstractController {
 
     public static Handler create = ctx -> {
         TransferDTO transferDTO = ctx.bodyAsClass(TransferDTO.class);
-        final Transfer transfer = TransferMapper.transferDTOtoTransfer(transferDTO);
-        transferService.transfer(transfer);
-
+        Transfer transfer = TransferMapper.transferDTOtoTransfer(transferDTO);
+        transfer = transferService.transfer(transfer);
+        ctx.json(TransferMapper.transferToTransferDTO(transfer));
     };
 
 }

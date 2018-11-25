@@ -17,7 +17,7 @@ class TransferRepositoryImpl implements TransferRepository {
 
         final String sql =
                 "INSERT INTO transfer (executedTimestamp, withdrawalAccountId, withdrawalAmount, depositAccountId, depositAmount) " +
-                "VALUES (:executedTimestamp, :withdrawAccountId, :withdrawAmount, :depositAccountId, :depositAmount)";
+                "VALUES (:executedTimestamp, :withdrawalAccountId, :withdrawalAmount, :depositAccountId, :depositAmount)";
 
         long id = (Long) con.createQuery(sql, true)
                 .addParameter("executedTimestamp", transfer.getExecutedTimestamp())

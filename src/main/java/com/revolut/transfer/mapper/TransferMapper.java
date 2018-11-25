@@ -36,6 +36,26 @@ public class TransferMapper {
 
     }
 
+    public static TransferDTO transferToTransferDTO(@NonNull Transfer transfer) {
+
+        TransferDTO transferDTO = new TransferDTO();
+        transferDTO.setId(Long.toString(transfer.getId()));
+        transferDTO.setExecutedTimestamp(Long.toString(transfer.getExecutedTimestamp().getTime()));
+
+        transferDTO.setWithdrawalAccountId(Long.toString(transfer.getWithdrawalAccount().getId()));
+        transferDTO.setWithdrawalAccountCurrency(transfer.getWithdrawalAccount().getCurrency().toString());
+        transferDTO.setWithdrawalAmount(AmountMapper.longToString(transfer.getWithdrawalAmount(),
+                transfer.getWithdrawalAccount().getCurrency()));
+
+        transferDTO.setDepositAccountId(Long.toString(transfer.getDepositAccount().getId()));
+        transferDTO.setDepositAccountCurrency(transfer.getDepositAccount().getCurrency().toString());
+        transferDTO.setDepositAmount(AmountMapper.longToString(transfer.getDepositAmount(),
+                transfer.getDepositAccount().getCurrency()));
+
+        return transferDTO;
+
+    }
+
     public static void mapAccounts(@NonNull Transfer transfer, @NonNull List<Account> accounts) {
 
         for (Account account : accounts) {
