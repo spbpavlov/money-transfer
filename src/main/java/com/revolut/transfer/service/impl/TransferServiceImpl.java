@@ -25,10 +25,11 @@ class TransferServiceImpl implements TransferService {
     }
 
     @Override
-    public void transfer(@NonNull final Transfer transfer) {
+    public Transfer transfer(@NonNull final Transfer transfer) {
 
         if (transfer.getWithdrawalAccountId() == transfer.getDepositAccountId()) {
-            return;
+            throw new IllegalStateException(
+                    String.format("Transfer within same account '%s' is not allowed", transfer.getWithdrawalAccountId()));
         }
 
         try(final RepositoryManager repositoryManager =
@@ -42,16 +43,15 @@ class TransferServiceImpl implements TransferService {
             TransferMapper.mapAccounts(transfer, accounts);
             validateTransferAccounts(transfer);
 
-            accountRepository.withdraw(transfer.getWithdrawalAccount(), transfer.getWithdrawalAmount());
-            validateWithdrawalAmount(transfer.getWithdrawalAccount());
+            final Account account = accountRepository.withdraw(transfer.getWithdrawalAccount(),
+                    transfer.getWithdrawalAmount());
+            validateWithdrawalAmount(account);
             accountRepository.deposit(transfer.getDepositAccount(), transfer.getDepositAmount());
-
-            // todo: if transaction will be rolled back Account remains with wrong amount
-
             final TransferRepository transferRepository = repositoryManager.getTransferRepository();
-            transferRepository.create(transfer);
-
+            final Transfer executedTransfer = transferRepository.create(transfer);
             repositoryManager.commit();
+
+            return executedTransfer;
 
         }
 

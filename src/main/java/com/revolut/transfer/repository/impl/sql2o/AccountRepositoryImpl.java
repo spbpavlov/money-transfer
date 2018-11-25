@@ -103,7 +103,14 @@ class AccountRepositoryImpl implements AccountRepository {
     @Override
     public Account deactivate(@NonNull Account account) {
 
-        updateActive(account.getId(), false);
+        final String sql = "UPDATE account " +
+                "SET active = false " +
+                "WHERE id = :id";
+
+        con.createQuery(sql)
+                .addParameter("id", account.getId())
+                .executeUpdate();
+
         return account.withActive(false);
 
     }
@@ -117,19 +124,6 @@ class AccountRepositoryImpl implements AccountRepository {
         con.createQuery(sql)
                 .addParameter("id", id)
                 .addParameter("balance", balance)
-                .executeUpdate();
-
-    }
-
-    private void updateActive(long id, boolean active) {
-
-        final String sql = "UPDATE account " +
-                "SET active = :active " +
-                "WHERE id = :id";
-
-        con.createQuery(sql)
-                .addParameter("id", id)
-                .addParameter("active", active)
                 .executeUpdate();
 
     }

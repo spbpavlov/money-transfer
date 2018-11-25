@@ -61,17 +61,18 @@ class AccountServiceImpl implements AccountService {
             Account account = accountRepository.findById(id, true);
             validateAccount(account, id);
 
-            if (account.isActive()) {
-
-                if (account.getBalance() > 0) {
-                    throw new IllegalStateException(
-                            String.format("Account '%s' balance must be empty for deactivation", account.getId()));
-                }
-
-                account = accountRepository.deactivate(account);
-                repositoryManager.commit();
-
+            if (!account.isActive()) {
+                throw new IllegalStateException(
+                        String.format("Account '%s' already been deactivated", account.getId()));
             }
+
+            if (account.getBalance() > 0) {
+                throw new IllegalStateException(
+                        String.format("Account '%s' balance must be empty for deactivation", account.getId()));
+            }
+
+            account = accountRepository.deactivate(account);
+            repositoryManager.commit();
 
             return account;
 

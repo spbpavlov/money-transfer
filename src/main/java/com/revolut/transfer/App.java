@@ -56,7 +56,6 @@ public class App {
 
     // todo API reference ?swagger (get /api)
     // todo README.MD
-    // todo check all throws String.format
     // todo test coverage
 
 }

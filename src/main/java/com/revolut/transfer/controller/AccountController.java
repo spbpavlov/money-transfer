@@ -16,19 +16,19 @@ public class AccountController extends AbstractController {
         accountService = serviceContext.getAccountService();
     }
 
-    public static Handler getAll = context -> {
-        final long customerId = pathParamToLong(context, "customer-id");
+    public static Handler getAll = ctx -> {
+        final long customerId = pathParamToLong(ctx, "customer-id");
         final List<Account> customerAccounts = accountService.findAllByCustomerId(customerId);
-        context.json(AccountMapper.accountToAccountDTO(customerAccounts));
+        ctx.json(AccountMapper.accountToAccountDTO(customerAccounts));
     };
 
-    public static Handler create = context -> {
-        AccountDTO accountDTO = context.bodyAsClass(AccountDTO.class);
-        final long customerId = pathParamToLong(context, "customer-id");
+    public static Handler create = ctx -> {
+        AccountDTO accountDTO = ctx.bodyAsClass(AccountDTO.class);
+        final long customerId = pathParamToLong(ctx, "customer-id");
         Account account = AccountMapper.accountDTOToAccount(accountDTO);
         account.setCustomerId(customerId);
         account = accountService.create(account);
-        context.json(AccountMapper.accountToAccountDTO(account));
+        ctx.json(AccountMapper.accountToAccountDTO(account));
     };
 
     public static Handler getOne = context -> {
@@ -37,18 +37,18 @@ public class AccountController extends AbstractController {
         context.json(AccountMapper.accountToAccountDTO(account));
     };
 
-    public static Handler getDeposits = context -> {
+    public static Handler getDeposits = ctx -> {
 
     };
 
-    public static Handler getWithdrawals = context -> {
+    public static Handler getWithdrawals = ctx -> {
 
     };
 
-    public static Handler deactivate = context -> {
-        final long accountId = pathParamToLong(context, "account-id");
+    public static Handler deactivate = ctx -> {
+        final long accountId = pathParamToLong(ctx, "account-id");
         final Account deactivatedAccount = accountService.deactivate(accountId);
-        context.json(AccountMapper.accountToAccountDTO(deactivatedAccount));
+        ctx.json(AccountMapper.accountToAccountDTO(deactivatedAccount));
     };
 
 }

@@ -4,6 +4,6 @@ import com.revolut.transfer.model.Transfer;
 
 public interface TransferService {
 
-    void transfer(Transfer transfer);
+    Transfer transfer(Transfer transfer);
 
 }

@@ -14,10 +14,11 @@ public class TransferController extends AbstractController {
         transferService = serviceContext.getTransferService();
     }
 
-    public static Handler create = context -> {
-        TransferDTO transferDTO = context.bodyAsClass(TransferDTO.class);
+    public static Handler create = ctx -> {
+        TransferDTO transferDTO = ctx.bodyAsClass(TransferDTO.class);
         final Transfer transfer = TransferMapper.transferDTOtoTransfer(transferDTO);
         transferService.transfer(transfer);
+
     };
 
 }

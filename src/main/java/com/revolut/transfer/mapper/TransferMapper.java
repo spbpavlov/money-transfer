@@ -8,13 +8,19 @@ import lombok.NonNull;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Objects;
 
 public class TransferMapper {
 
     public static Transfer transferDTOtoTransfer(@NonNull TransferDTO transferDTO) {
 
         Transfer transfer = new Transfer();
-        transfer.setExecutedTimestamp(new Timestamp(System.currentTimeMillis()));
+
+        transfer.setId(Objects.isNull(transferDTO.getId()) ? 0 : Long.parseLong(transferDTO.getId()));
+        transfer.setExecutedTimestamp(Objects.isNull(transferDTO.getExecutedTimestamp())
+                ? new Timestamp(System.currentTimeMillis())
+                : new Timestamp(Long.parseLong(transferDTO.getExecutedTimestamp()))
+        );
 
         transfer.setWithdrawalAccountId(Long.parseLong(transferDTO.getWithdrawalAccountId()));
         transfer.setWithdrawalAccountCurrency(Currency.valueOf(transferDTO.getWithdrawalAccountCurrency()));
