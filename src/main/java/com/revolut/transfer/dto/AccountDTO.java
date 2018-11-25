@@ -13,4 +13,5 @@ public class AccountDTO {
     private String id;
     private String currency;
     private String balance;
+    private String active;
 }

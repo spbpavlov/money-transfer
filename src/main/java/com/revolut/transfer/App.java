@@ -4,6 +4,9 @@ import com.revolut.transfer.controller.AccountController;
 import com.revolut.transfer.controller.TransferController;
 import io.javalin.Javalin;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static io.javalin.apibuilder.ApiBuilder.delete;
 import static io.javalin.apibuilder.ApiBuilder.get;
 import static io.javalin.apibuilder.ApiBuilder.patch;
@@ -20,14 +23,20 @@ public class App {
 
         app.routes(() -> {
             path("api", () -> {
-                get(ctx -> ctx.html("Welcome to Revolut Transfer API!"));
-                path("accounts/:customer-id", () -> {
-                    get(AccountController.getAll);
-                    post(AccountController.create);
+                path("accounts", () -> {
+                    path("customer/:customer-id", () -> {
+                        get(AccountController.getAll);
+                        post(AccountController.create);
+                    });
                     path(":account-id", () -> {
                         get(AccountController.getOne);
-                        patch(":amount", AccountController.update);
-                        delete(AccountController.delete);
+                        delete(AccountController.deactivate);
+                        path("deposits/:start/:end", () -> {
+                            get(AccountController.getDeposits);
+                        });
+                        path("withdrawals/:start/:end", () -> {
+                            get(AccountController.getWithdrawals);
+                        });
                     });
                 });
                 path("transfers", () -> {
@@ -36,6 +45,20 @@ public class App {
             });
         });
 
+        app.exception(Exception.class, (e, ctx) -> {
+            final Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            ctx.status(400)
+               .json(error);
+        });
+
     }
 
+    // todo API reference ?swagger (get /api)
+    // todo README.MD
+    // todo check all throws String.format
+    // todo test coverage
+
 }
+
+

@@ -7,11 +7,15 @@ import com.revolut.transfer.repository.TransferRepository;
 import org.sql2o.Connection;
 import org.sql2o.Sql2o;
 
-import java.util.Objects;
-
+/**
+ * Represents a set of repositories to deal with db within one transaction.
+ * {@link #commit()} must be called explicitly at the end of business method,
+ * otherwise transaction will be rolled back on connection close
+ */
 public class RepositoryManagerImpl implements RepositoryManager {
 
     private static final Sql2o sql2o;
+
     private final Connection con;
     private final AccountRepository accountRepository;
     private final TransferRepository transferRepository;
@@ -27,13 +31,8 @@ public class RepositoryManagerImpl implements RepositoryManager {
     }
 
     @Override
-    public void commitTransaction() {
+    public void commit() {
         this.con.commit();
-    }
-
-    @Override
-    public void rollbackTransaction() {
-        this.con.rollback();
     }
 
     @Override

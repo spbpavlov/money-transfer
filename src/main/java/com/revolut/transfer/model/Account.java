@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Wither;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Wither
 public class Account {
     private long id;
     private long customerId;
@@ -16,3 +18,5 @@ public class Account {
     private long balance;
     private boolean active;
 }
+
+//todo check lombok @

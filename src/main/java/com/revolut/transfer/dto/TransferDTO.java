@@ -10,7 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class TransferDTO {
-    private String from;
-    private String to;
-    private String amount;
+    private String withdrawalAccountId;
+    private String withdrawalAccountCurrency;
+    private String withdrawalAmount;
+    private String depositAccountId;
+    private String depositAccountCurrency;
+    private String depositAmount;
 }

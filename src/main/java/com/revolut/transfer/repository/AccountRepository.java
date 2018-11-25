@@ -2,10 +2,22 @@ package com.revolut.transfer.repository;
 
 import com.revolut.transfer.model.Account;
 
-public interface AccountRepository extends CrudRepository<Account, Long> {
+import java.util.List;
 
-    Iterable<Account> findAllByCustomerId(long customerId);
+public interface AccountRepository {
 
-    Account changeBalance(Account account, long newBalance);
+    Account findById(long var1, boolean forUpdate);
+
+    List<Account> findAllById(Iterable<Long> var1, boolean forUpdate);
+
+    List<Account> findAllByCustomerId(long customerId, boolean forUpdate);
+
+    Account create(Account account);
+
+    Account deactivate(Account account);
+
+    Account deposit(Account account, long deposit);
+
+    Account withdraw(Account account, long withdraw);
 
 }

@@ -1,9 +1,9 @@
 package com.revolut.transfer.repository;
 
-import com.revolut.transfer.model.Account;
+import com.revolut.transfer.model.Transfer;
 
 public interface TransferRepository {
 
-    void transfer(Account from, Account to, long amount);
+    Transfer create(Transfer transfer);
 
 }
