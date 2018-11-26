@@ -1,6 +1,7 @@
 # Test task for Revolut
 
 Design comments:
+- Lombok is used for getters / setters generation
 - API specification available at localhost:7000/spec
 - Balance is holding in cents in "long"-type (for the performance purposes) and is represented at DTO as "String"-type
 
