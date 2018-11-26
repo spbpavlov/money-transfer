@@ -21,10 +21,10 @@ public class AccountController extends AbstractController {
     };
 
     public static Handler create = ctx -> {
-        AccountDTO accountDTO = ctx.bodyAsClass(AccountDTO.class);
+        final AccountDTO accountDTO = ctx.bodyAsClass(AccountDTO.class);
         accountDTO.setCustomerId(ctx.pathParam("customer-id"));
-        accountDTO = accountService.create(accountDTO);
-        ctx.status(201).json(accountDTO);
+        final AccountDTO createdAccountDTO = accountService.create(accountDTO);
+        ctx.status(201).json(createdAccountDTO);
     };
 
     public static Handler getOne = ctx -> {

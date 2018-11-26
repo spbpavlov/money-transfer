@@ -18,9 +18,9 @@ public class TransferController extends AbstractController {
     }
 
     public static Handler create = ctx -> {
-        TransferDTO transferDTO = ctx.bodyAsClass(TransferDTO.class);
-        transferDTO = transferService.transfer(transferDTO);
-        ctx.status(201).json(transferDTO);
+        final TransferDTO transferDTO = ctx.bodyAsClass(TransferDTO.class);
+        final TransferDTO executedTransferDTO = transferService.transfer(transferDTO);
+        ctx.status(201).json(executedTransferDTO);
     };
 
     public static Handler getDeposits = ctx -> {
