@@ -3,25 +3,34 @@ package com.revolut.transfer;
 import com.revolut.transfer.controller.AccountController;
 import com.revolut.transfer.controller.TransferController;
 import io.javalin.Javalin;
+import io.javalin.core.util.SwaggerRenderer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static io.javalin.apibuilder.ApiBuilder.delete;
 import static io.javalin.apibuilder.ApiBuilder.get;
-import static io.javalin.apibuilder.ApiBuilder.patch;
 import static io.javalin.apibuilder.ApiBuilder.path;
 import static io.javalin.apibuilder.ApiBuilder.post;
 
 public class App {
 
+    private static Logger logger = LoggerFactory.getLogger(App.class);
+
     public static void main(String[] args) {
 
+        final SwaggerRenderer swaggerRenderer = new SwaggerRenderer("swagger.yaml");
+
         Javalin app = Javalin.create()
+                .enableWebJars()
                 .port(7000)
                 .start();
 
         app.routes(() -> {
+            get("/", ctx -> ctx.html("Welcome to Revolut transfer API!<br> Spec is <a href='/spec'>here</a>"));
+            get("/spec", swaggerRenderer);
             path("api", () -> {
                 path("accounts", () -> {
                     path("customer/:customer-id", () -> {
@@ -31,11 +40,11 @@ public class App {
                     path(":account-id", () -> {
                         get(AccountController.getOne);
                         delete(AccountController.deactivate);
-                        path("deposits/:start/:end", () -> {
-                            get(AccountController.getDeposits);
+                        path("deposits", () -> {
+                            get(TransferController.getDeposits);
                         });
-                        path("withdrawals/:start/:end", () -> {
-                            get(AccountController.getWithdrawals);
+                        path("withdrawals", () -> {
+                            get(TransferController.getWithdrawals);
                         });
                     });
                 });
@@ -46,19 +55,17 @@ public class App {
         });
 
         app.exception(Exception.class, (e, ctx) -> {
+            logger.error(e.getMessage());
             final Map<String, String> error = new HashMap<>();
             error.put("error", e.getMessage());
             ctx.status(400)
-               .json(error);
+                    .json(error);
         });
 
     }
 
     // todo API reference ?swagger (get /api)
-    // todo README.MD
     // todo test coverage
-    // todo DTO at service layer
-    // todo logger ?
 
 }
 

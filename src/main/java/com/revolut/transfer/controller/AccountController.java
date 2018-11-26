@@ -1,8 +1,6 @@
 package com.revolut.transfer.controller;
 
 import com.revolut.transfer.dto.AccountDTO;
-import com.revolut.transfer.mapper.AccountMapper;
-import com.revolut.transfer.model.Account;
 import com.revolut.transfer.service.AccountService;
 import io.javalin.Handler;
 
@@ -18,37 +16,27 @@ public class AccountController extends AbstractController {
 
     public static Handler getAll = ctx -> {
         final long customerId = pathParamToLong(ctx, "customer-id");
-        final List<Account> customerAccounts = accountService.findAllByCustomerId(customerId);
-        ctx.status(200).json(AccountMapper.accountToAccountDTO(customerAccounts));
+        final List<AccountDTO> customerAccountsDTO = accountService.findAllByCustomerId(customerId);
+        ctx.status(200).json(customerAccountsDTO);
     };
 
     public static Handler create = ctx -> {
         AccountDTO accountDTO = ctx.bodyAsClass(AccountDTO.class);
-        final long customerId = pathParamToLong(ctx, "customer-id");
-        Account account = AccountMapper.accountDTOToAccount(accountDTO);
-        account.setCustomerId(customerId);
-        account = accountService.create(account);
-        ctx.status(201).json(AccountMapper.accountToAccountDTO(account));
+        accountDTO.setCustomerId(ctx.pathParam("customer-id"));
+        accountDTO = accountService.create(accountDTO);
+        ctx.status(201).json(accountDTO);
     };
 
     public static Handler getOne = ctx -> {
         final long accountId = pathParamToLong(ctx, "account-id");
-        final Account account = accountService.findById(accountId);
-        ctx.status(200).json(AccountMapper.accountToAccountDTO(account));
-    };
-
-    public static Handler getDeposits = ctx -> {
-
-    };
-
-    public static Handler getWithdrawals = ctx -> {
-
+        final AccountDTO accountDTO = accountService.findById(accountId);
+        ctx.status(200).json(accountDTO);
     };
 
     public static Handler deactivate = ctx -> {
         final long accountId = pathParamToLong(ctx, "account-id");
-        final Account deactivatedAccount = accountService.deactivate(accountId);
-        ctx.status(200).json(AccountMapper.accountToAccountDTO(deactivatedAccount));
+        final AccountDTO deactivatedAccountDTO = accountService.deactivate(accountId);
+        ctx.status(200).json(deactivatedAccountDTO);
     };
 
 }

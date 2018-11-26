@@ -1,5 +1,8 @@
 package com.revolut.transfer.service.impl;
 
+import com.revolut.transfer.dto.DepositDTO;
+import com.revolut.transfer.dto.TransferDTO;
+import com.revolut.transfer.dto.WithdrawalDTO;
 import com.revolut.transfer.mapper.TransferMapper;
 import com.revolut.transfer.model.Account;
 import com.revolut.transfer.model.Transfer;
@@ -10,6 +13,7 @@ import com.revolut.transfer.repository.TransferRepository;
 import com.revolut.transfer.service.TransferService;
 import lombok.NonNull;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,7 +29,9 @@ class TransferServiceImpl implements TransferService {
     }
 
     @Override
-    public Transfer transfer(@NonNull final Transfer transfer) {
+    public TransferDTO transfer(@NonNull final TransferDTO transferDTO) {
+
+        final Transfer transfer = TransferMapper.transferDTOtoTransfer(transferDTO);
 
         if (transfer.getWithdrawalAccountId() == transfer.getDepositAccountId()) {
             throw new IllegalStateException(
@@ -43,41 +49,63 @@ class TransferServiceImpl implements TransferService {
             TransferMapper.mapAccounts(transfer, accounts);
             validateTransferAccounts(transfer);
 
-            final Account account = accountRepository.withdraw(transfer.getWithdrawalAccount(),
+            final Account withdrawalAccount = accountRepository.withdraw(transfer.getWithdrawalAccount(),
                     transfer.getWithdrawalAmount());
-            validateWithdrawalAmount(account);
+            validateWithdrawPossibility(withdrawalAccount);
             accountRepository.deposit(transfer.getDepositAccount(), transfer.getDepositAmount());
             final TransferRepository transferRepository = repositoryManager.getTransferRepository();
             final Transfer executedTransfer = transferRepository.create(transfer);
             repositoryManager.commit();
 
-            return executedTransfer;
+            return TransferMapper.transferToTransferDTO(executedTransfer);
 
+        }
+
+    }
+
+    @Override
+    public List<DepositDTO> getDeposits(long accountId, Timestamp start, Timestamp end) {
+
+        try (final RepositoryManager repositoryManager =
+                     repositoryManagerFactory.getRepositoryManager(TRANSACTION_READ_COMMITTED)) {
+
+            final AccountRepository accountRepository = repositoryManager.getAccountRepository();
+            final Account account = accountRepository.findById(accountId, false);
+            validateAccount(account, false);
+
+            final TransferRepository transferRepository = repositoryManager.getTransferRepository();
+            final List<Transfer> deposits = transferRepository.
+                    findDepositByAccountId(accountId, start, end);
+            deposits.forEach(transfer -> transfer.setDepositAccountCurrency(account.getCurrency()));
+
+            return TransferMapper.transferToDepositDTO(deposits);
+        }
+
+    }
+
+    @Override
+    public List<WithdrawalDTO> getWithdrawals(long accountId, Timestamp start, Timestamp end) {
+
+        try (final RepositoryManager repositoryManager =
+                     repositoryManagerFactory.getRepositoryManager(TRANSACTION_READ_COMMITTED)) {
+
+            final AccountRepository accountRepository = repositoryManager.getAccountRepository();
+            final Account account = accountRepository.findById(accountId, false);
+            validateAccount(account, false);
+
+            final TransferRepository transferRepository = repositoryManager.getTransferRepository();
+            final List<Transfer> withdrawals = transferRepository.
+                    findWithdrawalByAccountId(accountId,  start, end);
+            withdrawals.forEach(transfer -> transfer.setWithdrawalAccountCurrency(account.getCurrency()));
+            return TransferMapper.transferToWithdrawalDTO(withdrawals);
         }
 
     }
 
     private void validateTransferAccounts(Transfer transfer) {
 
-        if (Objects.isNull(transfer.getWithdrawalAccount())) {
-            throw new IllegalStateException(
-                    String.format("Unknown withdrawal account '%s'", transfer.getWithdrawalAccountId()));
-        }
-
-        if (!transfer.getWithdrawalAccount().isActive()) {
-            throw new IllegalStateException(
-                    String.format("Withdrawal account '%s' is deactivated", transfer.getWithdrawalAccountId()));
-        }
-
-        if (Objects.isNull(transfer.getDepositAccount())) {
-            throw new IllegalStateException(
-                    String.format("Unknown deposit account '%s'", transfer.getDepositAccountId()));
-        }
-
-        if (!transfer.getDepositAccount().isActive()) {
-            throw new IllegalStateException(
-                    String.format("Deposit account '%s' is deactivated", transfer.getDepositAccountId()));
-        }
+        validateAccount(transfer.getWithdrawalAccount(), true);
+        validateAccount(transfer.getDepositAccount(), true);
 
         if (!transfer.getWithdrawalAccount().getCurrency().equals(transfer.getWithdrawalAccountCurrency())) {
             throw new IllegalStateException(
@@ -95,7 +123,21 @@ class TransferServiceImpl implements TransferService {
 
     }
 
-    private void validateWithdrawalAmount(Account withdrawalAccount) {
+    private void validateAccount(Account account, boolean mustBeActive) {
+
+        if (Objects.isNull(account)) {
+            throw new IllegalStateException(
+                    String.format("Unknown account '%s'", account.getId()));
+        }
+
+        if (mustBeActive && !account.isActive()) {
+            throw new IllegalStateException(
+                    String.format("Account '%s' is deactivated", account.getId()));
+        }
+
+    }
+
+    private void validateWithdrawPossibility(Account withdrawalAccount) {
 
         if (withdrawalAccount.getBalance() < 0) {
             throw new IllegalStateException(

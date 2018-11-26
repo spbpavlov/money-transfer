@@ -15,6 +15,7 @@ public class AccountMapper {
 
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setId(Long.toString(account.getId()));
+        accountDTO.setCustomerId(Long.toString(account.getCustomerId()));
         accountDTO.setCurrency(account.getCurrency().toString());
         accountDTO.setBalance(AmountMapper.longToString(account.getBalance(), account.getCurrency()));
         accountDTO.setActive(Boolean.toString(account.isActive()));
@@ -26,6 +27,7 @@ public class AccountMapper {
 
         Account account = new Account();
         account.setId(Objects.isNull(accountDTO.getId()) ? 0 : Long.parseLong(accountDTO.getId()));
+        account.setCustomerId(Objects.isNull(accountDTO.getCustomerId()) ? 0 : Long.parseLong(accountDTO.getCustomerId()));
         account.setCurrency(Currency.valueOf(accountDTO.getCurrency()));
         account.setBalance(Objects.isNull(accountDTO.getBalance()) ? 0 :
                 AmountMapper.stringToLong(accountDTO.getBalance(), account.getCurrency()));
@@ -39,6 +41,14 @@ public class AccountMapper {
 
         return accounts.stream()
                 .map(AccountMapper::accountToAccountDTO)
+                .collect(Collectors.toList());
+
+    }
+
+    public static List<Account> accountDTOToAccount(@NonNull List<AccountDTO> accountsDTO) {
+
+        return accountsDTO.stream()
+                .map(AccountMapper::accountDTOToAccount)
                 .collect(Collectors.toList());
 
     }

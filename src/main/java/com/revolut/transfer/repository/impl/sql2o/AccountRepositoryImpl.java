@@ -58,9 +58,7 @@ class AccountRepositoryImpl implements AccountRepository {
                 .executeUpdate()
                 .getKey();
 
-        account.setId(id);
-
-        return account;
+        return account.withId(id);
 
     }
 

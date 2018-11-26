@@ -4,6 +4,9 @@ import com.revolut.transfer.service.ServiceContext;
 import com.revolut.transfer.service.impl.ServiceContextImpl;
 import io.javalin.Context;
 
+import java.sql.Timestamp;
+import java.util.Objects;
+
 class AbstractController {
 
     static final ServiceContext serviceContext = ServiceContextImpl.getInstance();
@@ -22,5 +25,26 @@ class AbstractController {
         }
 
     }
+
+    static Timestamp queryParamToTimestamp(Context context, String paramName) {
+
+        final String paramValue = context.queryParam(paramName);
+
+        if (Objects.isNull(paramValue)) {
+            return null;
+        }
+
+        try {
+            final long longValue = Long.parseLong(paramValue);
+            return new Timestamp(longValue);
+        } catch (NumberFormatException nfe) {
+            throw new NumberFormatException(
+                    String.format("Invalid value '%s' for query param ':%s'",
+                            paramValue,
+                            paramName));
+        }
+
+    }
+
 
 }

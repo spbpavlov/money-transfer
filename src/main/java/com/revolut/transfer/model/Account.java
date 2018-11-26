@@ -9,7 +9,6 @@ import lombok.experimental.Wither;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Wither
 public class Account {
     private long id;
@@ -18,5 +17,3 @@ public class Account {
     private long balance;
     private boolean active;
 }
-
-//todo check lombok @

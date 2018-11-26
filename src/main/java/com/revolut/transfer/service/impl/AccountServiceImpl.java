@@ -1,5 +1,7 @@
 package com.revolut.transfer.service.impl;
 
+import com.revolut.transfer.dto.AccountDTO;
+import com.revolut.transfer.mapper.AccountMapper;
 import com.revolut.transfer.model.Account;
 import com.revolut.transfer.repository.AccountRepository;
 import com.revolut.transfer.repository.RepositoryManager;
@@ -21,45 +23,52 @@ class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<Account> findAllByCustomerId(long customerId) {
+    public List<AccountDTO> findAllByCustomerId(long customerId) {
         try (final RepositoryManager repositoryManager =
                      repositoryManagerFactory.getRepositoryManager(TRANSACTION_READ_COMMITTED)) {
             final AccountRepository accountRepository = repositoryManager.getAccountRepository();
-            return accountRepository.findAllByCustomerId(customerId, false);
+            final List<Account> accounts = accountRepository.findAllByCustomerId(customerId, false);
+            return AccountMapper.accountToAccountDTO(accounts);
         }
     }
 
     @Override
-    public Account create(@NonNull Account account) {
+    public AccountDTO create(@NonNull AccountDTO accountDTO) {
+
+        Account account = AccountMapper.accountDTOToAccount(accountDTO);
+
         try (final RepositoryManager repositoryManager =
                      repositoryManagerFactory.getRepositoryManager(TRANSACTION_READ_COMMITTED)) {
             final AccountRepository accountRepository = repositoryManager.getAccountRepository();
             account.setActive(true);
             account = accountRepository.create(account);
             repositoryManager.commit();
-            return account;
+            return AccountMapper.accountToAccountDTO(account);
         }
     }
 
     @Override
-    public Account findById(Long id) {
+    public AccountDTO findById(long accountId) {
         try (final RepositoryManager repositoryManager =
                      repositoryManagerFactory.getRepositoryManager(TRANSACTION_READ_COMMITTED)) {
             final AccountRepository accountRepository = repositoryManager.getAccountRepository();
-            return accountRepository.findById(id, false);
+            final Account account = accountRepository.findById(accountId, false);
 
+            return AccountMapper.accountToAccountDTO(account);
             //todo ? read only transaction
         }
     }
 
+
+
     @Override
-    public Account deactivate(Long id) {
+    public AccountDTO deactivate(long accountId) {
         try (final RepositoryManager repositoryManager =
                      repositoryManagerFactory.getRepositoryManager(TRANSACTION_READ_COMMITTED)) {
 
             final AccountRepository accountRepository = repositoryManager.getAccountRepository();
-            Account account = accountRepository.findById(id, true);
-            validateAccount(account, id);
+            Account account = accountRepository.findById(accountId, true);
+            validateAccount(account, accountId);
 
             if (!account.isActive()) {
                 throw new IllegalStateException(
@@ -74,16 +83,16 @@ class AccountServiceImpl implements AccountService {
             account = accountRepository.deactivate(account);
             repositoryManager.commit();
 
-            return account;
+            return AccountMapper.accountToAccountDTO(account);
 
         }
     }
 
-    private void validateAccount(Account account, long id) {
+    private void validateAccount(Account account, long accountId) {
 
         if (Objects.isNull(account)) {
             throw new IllegalStateException(
-                    String.format("Unknown account '%s'", id));
+                    String.format("Unknown account '%s'", accountId));
         }
 
     }

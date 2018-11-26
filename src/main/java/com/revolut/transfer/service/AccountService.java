@@ -1,17 +1,18 @@
 package com.revolut.transfer.service;
 
-import com.revolut.transfer.model.Account;
+import com.revolut.transfer.dto.AccountDTO;
+import com.revolut.transfer.dto.TransferDTO;
 
 import java.util.List;
 
 public interface AccountService {
 
-    List<Account> findAllByCustomerId(long customerId);
+    List<AccountDTO> findAllByCustomerId(long customerId);
 
-    Account create(Account account);
+    AccountDTO create(AccountDTO account);
 
-    Account findById(Long id);
+    AccountDTO findById(long accountId);
 
-    Account deactivate(Long id);
+    AccountDTO deactivate(long accountId);
 
 }
