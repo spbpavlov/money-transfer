@@ -72,7 +72,7 @@ class TransferServiceImpl implements TransferService {
 
             final AccountRepository accountRepository = repositoryManager.getAccountRepository();
             final Account account = accountRepository.findById(accountId, false);
-            validateAccount(account, false);
+            validateAccount(account, accountId,false);
 
             final TransferRepository transferRepository = repositoryManager.getTransferRepository();
             final List<Transfer> deposits = transferRepository.
@@ -92,7 +92,7 @@ class TransferServiceImpl implements TransferService {
 
             final AccountRepository accountRepository = repositoryManager.getAccountRepository();
             final Account account = accountRepository.findById(accountId, false);
-            validateAccount(account, false);
+            validateAccount(account, accountId, false);
 
             final TransferRepository transferRepository = repositoryManager.getTransferRepository();
             final List<Transfer> withdrawals = transferRepository.
@@ -117,8 +117,8 @@ class TransferServiceImpl implements TransferService {
 
     private void validateTransferAccounts(Transfer transfer) {
 
-        validateAccount(transfer.getWithdrawalAccount(), true);
-        validateAccount(transfer.getDepositAccount(), true);
+        validateAccount(transfer.getWithdrawalAccount(), transfer.getWithdrawalAccountId(), true);
+        validateAccount(transfer.getDepositAccount(), transfer.getDepositAccountId(), true);
 
         if (!transfer.getWithdrawalAccount().getCurrency().equals(transfer.getWithdrawalAccountCurrency())) {
             throw new IllegalStateException(
@@ -136,11 +136,11 @@ class TransferServiceImpl implements TransferService {
 
     }
 
-    private void validateAccount(Account account, boolean mustBeActive) {
+    private void validateAccount(Account account, long accountId, boolean mustBeActive) {
 
         if (Objects.isNull(account)) {
             throw new IllegalStateException(
-                    String.format("Unknown account '%s'", account.getId()));
+                    String.format("Unknown account '%s'", accountId));
         }
 
         if (mustBeActive && !account.isActive()) {
