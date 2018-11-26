@@ -11,12 +11,12 @@ public class Transfer {
 
     private long id;
     private Timestamp executedTimestamp;
-    private transient Account withdrawalAccount;
-    private transient Currency withdrawalAccountCurrency;
+    private Account withdrawalAccount;
+    private Currency withdrawalAccountCurrency;
     private long withdrawalAccountId;
     private long withdrawalAmount;
-    private transient Account depositAccount;
-    private transient Currency depositAccountCurrency;
+    private Account depositAccount;
+    private Currency depositAccountCurrency;
     private long depositAccountId;
     private long depositAmount;
 
