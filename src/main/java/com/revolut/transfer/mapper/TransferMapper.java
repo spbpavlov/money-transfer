@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class TransferMapper {
+final public class TransferMapper {
 
     public static Transfer transferDTOtoTransfer(@NonNull TransferDTO transferDTO) {
 
@@ -114,5 +114,7 @@ public class TransferMapper {
                 .collect(Collectors.toList());
 
     }
+
+    private TransferMapper() {};
 
 }

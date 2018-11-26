@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class AccountMapper {
+final public class AccountMapper {
 
     public static AccountDTO accountToAccountDTO(@NonNull Account account) {
 
@@ -52,5 +52,7 @@ public class AccountMapper {
                 .collect(Collectors.toList());
 
     }
+
+    private AccountMapper() {};
 
 }

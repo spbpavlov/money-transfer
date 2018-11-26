@@ -9,7 +9,7 @@ import java.security.InvalidParameterException;
  * Class for amount conversion in different currencies
  * long <-> String.
  */
-public class AmountMapper {
+final public class AmountMapper {
 
     private final static String delimiter = ".";
 
@@ -63,5 +63,7 @@ public class AmountMapper {
         return Long.parseLong(sb.toString());
 
     }
+
+    private AmountMapper() {};
 
 }
