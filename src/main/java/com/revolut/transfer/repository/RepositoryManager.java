@@ -9,6 +9,8 @@ public interface RepositoryManager extends AutoCloseable  {
 
     void commit();
 
+    void rollback();
+
     AccountRepository getAccountRepository();
 
     TransferRepository getTransferRepository();

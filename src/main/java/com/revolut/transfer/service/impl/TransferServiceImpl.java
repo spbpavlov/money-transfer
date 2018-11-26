@@ -38,6 +38,7 @@ class TransferServiceImpl implements TransferService {
                     String.format("Transfer within same account '%s' is not allowed", transfer.getWithdrawalAccountId()));
         }
 
+        // If any exception occurs transaction will be rolled back automatically on repositoryManager close.
         try(final RepositoryManager repositoryManager =
                 repositoryManagerFactory.getRepositoryManager(TRANSACTION_READ_COMMITTED)) {
 
@@ -46,18 +47,18 @@ class TransferServiceImpl implements TransferService {
             final List<Account> accounts = accountRepository.findAllById(
                     asList(transfer.getWithdrawalAccountId(), transfer.getDepositAccountId()),
                     true);
-            TransferMapper.mapAccounts(transfer, accounts);
+            mapAccounts(transfer, accounts);
             validateTransferAccounts(transfer);
+            validateWithdrawPossibility(transfer.getWithdrawalAccount(), transfer.getWithdrawalAmount());
 
-            final Account withdrawalAccount = accountRepository.withdraw(transfer.getWithdrawalAccount(),
-                    transfer.getWithdrawalAmount());
-            validateWithdrawPossibility(withdrawalAccount);
+            accountRepository.withdraw(transfer.getWithdrawalAccount(), transfer.getWithdrawalAmount());
             accountRepository.deposit(transfer.getDepositAccount(), transfer.getDepositAmount());
             final TransferRepository transferRepository = repositoryManager.getTransferRepository();
             final Transfer executedTransfer = transferRepository.create(transfer);
+            final TransferDTO executedTransferDTO = TransferMapper.transferToTransferDTO(executedTransfer);
             repositoryManager.commit();
 
-            return TransferMapper.transferToTransferDTO(executedTransfer);
+            return executedTransferDTO;
 
         }
 
@@ -102,6 +103,18 @@ class TransferServiceImpl implements TransferService {
 
     }
 
+    private void mapAccounts(@NonNull Transfer transfer, @NonNull List<Account> accounts) {
+
+        for (Account account : accounts) {
+            if (account.getId() ==  transfer.getWithdrawalAccountId()) {
+                transfer.setWithdrawalAccount(account);
+            } else if (account.getId() ==  transfer.getDepositAccountId()) {
+                transfer.setDepositAccount(account);
+            }
+        }
+
+    }
+
     private void validateTransferAccounts(Transfer transfer) {
 
         validateAccount(transfer.getWithdrawalAccount(), true);
@@ -137,9 +150,9 @@ class TransferServiceImpl implements TransferService {
 
     }
 
-    private void validateWithdrawPossibility(Account withdrawalAccount) {
+    private void validateWithdrawPossibility(Account withdrawalAccount, long amount) {
 
-        if (withdrawalAccount.getBalance() < 0) {
+        if (withdrawalAccount.getBalance() - amount < 0) {
             throw new IllegalStateException(
                     String.format("Not enough money for account '%s' withdrawal",
                             withdrawalAccount.getId()));

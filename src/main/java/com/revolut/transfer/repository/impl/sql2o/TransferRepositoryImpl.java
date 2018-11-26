@@ -1,9 +1,7 @@
 package com.revolut.transfer.repository.impl.sql2o;
 
-import com.revolut.transfer.model.Account;
 import com.revolut.transfer.model.Transfer;
 import com.revolut.transfer.repository.TransferRepository;
-import lombok.NonNull;
 import org.sql2o.Connection;
 import org.sql2o.Query;
 

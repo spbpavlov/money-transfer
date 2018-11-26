@@ -36,15 +36,18 @@ class AccountServiceImpl implements AccountService {
     @Override
     public AccountDTO create(@NonNull AccountDTO accountDTO) {
 
-        Account account = AccountMapper.accountDTOToAccount(accountDTO);
+        final Account account = AccountMapper.accountDTOToAccount(accountDTO);
 
+        // If any exception occurs transaction will be rolled back automatically on repositoryManager close.
         try (final RepositoryManager repositoryManager =
                      repositoryManagerFactory.getRepositoryManager(TRANSACTION_READ_COMMITTED)) {
             final AccountRepository accountRepository = repositoryManager.getAccountRepository();
             account.setActive(true);
-            account = accountRepository.create(account);
+            final Account createdAccount = accountRepository.create(account);
+            final AccountDTO createdAccountDTO = AccountMapper.accountToAccountDTO(createdAccount);
             repositoryManager.commit();
-            return AccountMapper.accountToAccountDTO(account);
+
+            return createdAccountDTO;
         }
     }
 
@@ -63,7 +66,6 @@ class AccountServiceImpl implements AccountService {
             }
 
             return AccountMapper.accountToAccountDTO(account);
-
         }
     }
 
@@ -71,11 +73,12 @@ class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountDTO deactivate(long accountId) {
+        // If any exception occurs transaction will be rolled back automatically on repositoryManager close.
         try (final RepositoryManager repositoryManager =
                      repositoryManagerFactory.getRepositoryManager(TRANSACTION_READ_COMMITTED)) {
 
             final AccountRepository accountRepository = repositoryManager.getAccountRepository();
-            Account account = accountRepository.findById(accountId, true);
+            final Account account = accountRepository.findById(accountId, true);
             validateAccount(account, accountId);
 
             if (!account.isActive()) {
@@ -88,11 +91,11 @@ class AccountServiceImpl implements AccountService {
                         String.format("Account '%s' balance must be empty for deactivation", account.getId()));
             }
 
-            account = accountRepository.deactivate(account);
+            final Account deactivatedAccount = accountRepository.deactivate(account);
+            final AccountDTO deactivatedAccountDTO = AccountMapper.accountToAccountDTO(deactivatedAccount);
             repositoryManager.commit();
 
-            return AccountMapper.accountToAccountDTO(account);
-
+            return deactivatedAccountDTO;
         }
     }
 

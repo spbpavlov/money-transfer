@@ -29,11 +29,18 @@ public class RepositoryManagerImpl implements RepositoryManager {
 
     public RepositoryManagerImpl(int isolationLevel) {
         this.con = sql2o.beginTransaction(isolationLevel);
+        this.con.setRollbackOnClose(true);
+        this.con.setRollbackOnException(true);
     }
 
     @Override
     public void commit() {
         this.con.commit();
+    }
+
+    @Override
+    public void rollback() {
+        this.con.rollback();
     }
 
     /**

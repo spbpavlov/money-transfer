@@ -1,10 +1,8 @@
 package com.revolut.transfer.mapper;
 
-import com.revolut.transfer.dto.AccountDTO;
 import com.revolut.transfer.dto.DepositDTO;
 import com.revolut.transfer.dto.TransferDTO;
 import com.revolut.transfer.dto.WithdrawalDTO;
-import com.revolut.transfer.model.Account;
 import com.revolut.transfer.model.Currency;
 import com.revolut.transfer.model.Transfer;
 import lombok.NonNull;
@@ -114,18 +112,6 @@ public class TransferMapper {
         return transfers.stream()
                 .map(TransferMapper::transferToWithdrawalDTO)
                 .collect(Collectors.toList());
-
-    }
-
-    public static void mapAccounts(@NonNull Transfer transfer, @NonNull List<Account> accounts) {
-
-        for (Account account : accounts) {
-            if (account.getId() ==  transfer.getWithdrawalAccountId()) {
-                transfer.setWithdrawalAccount(account);
-            } else if (account.getId() ==  transfer.getDepositAccountId()) {
-                transfer.setDepositAccount(account);
-            }
-        }
 
     }
 
