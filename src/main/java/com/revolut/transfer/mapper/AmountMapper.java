@@ -64,6 +64,6 @@ final public class AmountMapper {
 
     }
 
-    private AmountMapper() {};
+    private AmountMapper() {}
 
 }

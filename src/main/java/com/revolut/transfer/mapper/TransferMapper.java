@@ -115,6 +115,6 @@ final public class TransferMapper {
 
     }
 
-    private TransferMapper() {};
+    private TransferMapper() {}
 
 }

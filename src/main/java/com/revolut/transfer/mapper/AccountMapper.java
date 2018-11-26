@@ -53,6 +53,6 @@ final public class AccountMapper {
 
     }
 
-    private AccountMapper() {};
+    private AccountMapper() {}
 
 }
