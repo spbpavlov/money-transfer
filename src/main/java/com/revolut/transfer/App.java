@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static io.javalin.apibuilder.ApiBuilder.delete;
 import static io.javalin.apibuilder.ApiBuilder.get;
@@ -58,8 +59,12 @@ public class App {
             logger.error(e.getMessage());
             final Map<String, String> error = new HashMap<>();
             error.put("error", e.getMessage());
-            ctx.status(400)
-                    .json(error);
+            if (e instanceof NoSuchElementException) {
+                ctx.status(404);
+            } else {
+                ctx.status(400);
+            }
+            ctx.json(error);
         });
 
     }

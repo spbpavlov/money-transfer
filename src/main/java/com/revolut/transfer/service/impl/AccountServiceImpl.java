@@ -10,6 +10,7 @@ import com.revolut.transfer.service.AccountService;
 import lombok.NonNull;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import static java.sql.Connection.TRANSACTION_READ_COMMITTED;
@@ -51,11 +52,18 @@ class AccountServiceImpl implements AccountService {
     public AccountDTO findById(long accountId) {
         try (final RepositoryManager repositoryManager =
                      repositoryManagerFactory.getRepositoryManager(TRANSACTION_READ_COMMITTED)) {
+
             final AccountRepository accountRepository = repositoryManager.getAccountRepository();
             final Account account = accountRepository.findById(accountId, false);
 
+            if (Objects.isNull(account)) {
+                throw new NoSuchElementException(
+                        String.format("Account with id '%s' not found", accountId)
+                );
+            }
+
             return AccountMapper.accountToAccountDTO(account);
-            //todo ? read only transaction
+
         }
     }
 
