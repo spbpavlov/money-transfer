@@ -11,7 +11,7 @@ import java.security.InvalidParameterException;
  */
 public class AmountMapper {
 
-    private final static String DELIMITER = ".";
+    private final static String delimiter = ".";
 
     public static String longToString(long amount, @NonNull Currency currency) {
 
@@ -39,12 +39,12 @@ public class AmountMapper {
         }
 
         int zeros = currency.getPrecision();
-        final int i = sb.indexOf(DELIMITER);
+        final int i = sb.indexOf(delimiter);
 
         if (i > -1) {
             zeros = zeros - (sb.length() - 1 - i);
             sb.deleteCharAt(i);
-            final int k = sb.indexOf(DELIMITER);
+            final int k = sb.indexOf(delimiter);
             if (k > -1) {
                 throw new NumberFormatException(
                         String.format("Amount '%s' should contain only one delimiter", amount));

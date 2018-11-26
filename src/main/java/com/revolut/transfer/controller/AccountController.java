@@ -19,7 +19,7 @@ public class AccountController extends AbstractController {
     public static Handler getAll = ctx -> {
         final long customerId = pathParamToLong(ctx, "customer-id");
         final List<Account> customerAccounts = accountService.findAllByCustomerId(customerId);
-        ctx.json(AccountMapper.accountToAccountDTO(customerAccounts));
+        ctx.status(200).json(AccountMapper.accountToAccountDTO(customerAccounts));
     };
 
     public static Handler create = ctx -> {
@@ -28,13 +28,13 @@ public class AccountController extends AbstractController {
         Account account = AccountMapper.accountDTOToAccount(accountDTO);
         account.setCustomerId(customerId);
         account = accountService.create(account);
-        ctx.json(AccountMapper.accountToAccountDTO(account));
+        ctx.status(201).json(AccountMapper.accountToAccountDTO(account));
     };
 
-    public static Handler getOne = context -> {
-        final long accountId = pathParamToLong(context, "account-id");
+    public static Handler getOne = ctx -> {
+        final long accountId = pathParamToLong(ctx, "account-id");
         final Account account = accountService.findById(accountId);
-        context.json(AccountMapper.accountToAccountDTO(account));
+        ctx.status(200).json(AccountMapper.accountToAccountDTO(account));
     };
 
     public static Handler getDeposits = ctx -> {
@@ -48,7 +48,7 @@ public class AccountController extends AbstractController {
     public static Handler deactivate = ctx -> {
         final long accountId = pathParamToLong(ctx, "account-id");
         final Account deactivatedAccount = accountService.deactivate(accountId);
-        ctx.json(AccountMapper.accountToAccountDTO(deactivatedAccount));
+        ctx.status(200).json(AccountMapper.accountToAccountDTO(deactivatedAccount));
     };
 
 }
