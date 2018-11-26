@@ -58,7 +58,7 @@ public class App {
     // todo README.MD
     // todo test coverage
     // todo DTO at service layer
-    // todo check if balance will be amount
+    // todo logger ?
 
 }
 
