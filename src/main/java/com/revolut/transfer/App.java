@@ -21,12 +21,16 @@ public class App {
     private static Logger logger = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) {
+        new App(7000);
+    }
+
+    App (int port) {
 
         final SwaggerRenderer swaggerRenderer = new SwaggerRenderer("swagger.yaml");
 
         Javalin app = Javalin.create()
                 .enableWebJars()
-                .port(7000)
+                .port(port)
                 .start();
 
         app.routes(() -> {
