@@ -1,15 +1,11 @@
 package com.revolut.transfer.controller;
 
-import com.revolut.transfer.service.ServiceContext;
-import com.revolut.transfer.service.impl.ServiceContextImpl;
 import io.javalin.Context;
 
 import java.sql.Timestamp;
 import java.util.Objects;
 
 class AbstractController {
-
-    static final ServiceContext serviceContext = ServiceContextImpl.getInstance();
 
     static long pathParamToLong(Context context, String paramName) {
 
@@ -45,6 +41,5 @@ class AbstractController {
         }
 
     }
-
 
 }

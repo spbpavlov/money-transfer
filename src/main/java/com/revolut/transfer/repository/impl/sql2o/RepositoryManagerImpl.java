@@ -1,6 +1,5 @@
 package com.revolut.transfer.repository.impl.sql2o;
 
-import com.revolut.transfer.db.DataSourceFactory;
 import com.revolut.transfer.repository.AccountRepository;
 import com.revolut.transfer.repository.RepositoryManager;
 import com.revolut.transfer.repository.TransferRepository;
@@ -17,17 +16,11 @@ import java.util.Objects;
  */
 public class RepositoryManagerImpl implements RepositoryManager {
 
-    private static final Sql2o sql2o;
-
     private final Connection con;
     private AccountRepository accountRepository;
     private TransferRepository transferRepository;
 
-    static {
-        sql2o = new Sql2o(DataSourceFactory.getDataSource());
-    }
-
-    public RepositoryManagerImpl(int isolationLevel) {
+    public RepositoryManagerImpl(Sql2o sql2o, int isolationLevel) {
         this.con = sql2o.beginTransaction(isolationLevel);
         this.con.setRollbackOnClose(true);
         this.con.setRollbackOnException(true);

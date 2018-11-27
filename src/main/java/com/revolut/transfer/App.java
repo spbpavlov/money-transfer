@@ -2,6 +2,11 @@ package com.revolut.transfer;
 
 import com.revolut.transfer.controller.AccountController;
 import com.revolut.transfer.controller.TransferController;
+import com.revolut.transfer.db.DataSourceFactory;
+import com.revolut.transfer.repository.RepositoryManagerFactory;
+import com.revolut.transfer.repository.impl.sql2o.RepositoryManagerFactoryImpl;
+import com.revolut.transfer.service.ServiceContext;
+import com.revolut.transfer.service.impl.ServiceContextImpl;
 import io.javalin.Javalin;
 import io.javalin.core.util.SwaggerRenderer;
 import org.slf4j.Logger;
@@ -19,47 +24,66 @@ import static io.javalin.apibuilder.ApiBuilder.post;
 public class App {
 
     private static Logger logger = LoggerFactory.getLogger(App.class);
+    private ServiceContext serviceContext;
+
+    private final Javalin javalinApp;
 
     public static void main(String[] args) {
-        new App(7000);
+        final App app = new App(7000);
+
+        final RepositoryManagerFactory repositoryManagerFactory
+                = new RepositoryManagerFactoryImpl(DataSourceFactory.getDataSource());
+        final ServiceContext serviceContext = new ServiceContextImpl(repositoryManagerFactory);
+        app.setServiceContext(serviceContext);
+        app.initRoutes();
     }
 
-    App (int port) {
+    public App (int port) {
 
-        final SwaggerRenderer swaggerRenderer = new SwaggerRenderer("swagger.yaml");
-
-        Javalin app = Javalin.create()
+        this.javalinApp = Javalin.create()
                 .enableWebJars()
                 .port(port)
                 .start();
 
-        app.routes(() -> {
+    }
+
+    private void setServiceContext(ServiceContext serviceContext) {
+        this.serviceContext = serviceContext;
+    }
+
+    public void initRoutes() {
+
+        final SwaggerRenderer swaggerRenderer = new SwaggerRenderer("swagger.yaml");
+        final AccountController accountController = new AccountController(serviceContext);
+        final TransferController transferController = new TransferController(serviceContext);
+
+        this.javalinApp.routes(() -> {
             get("/", ctx -> ctx.html("Welcome to Revolut transfer API!<br> Spec is <a href='/spec'>here</a>"));
             get("/spec", swaggerRenderer);
             path("api", () -> {
                 path("accounts", () -> {
                     path("customer/:customer-id", () -> {
-                        get(AccountController.getAll);
-                        post(AccountController.create);
+                        get(accountController::getAll);
+                        post(accountController::create);
                     });
                     path(":account-id", () -> {
-                        get(AccountController.getOne);
-                        delete(AccountController.deactivate);
+                        get(accountController::getOne);
+                        delete(accountController::deactivate);
                         path("deposits", () -> {
-                            get(TransferController.getDeposits);
+                            get(transferController::getDeposits);
                         });
                         path("withdrawals", () -> {
-                            get(TransferController.getWithdrawals);
+                            get(transferController::getWithdrawals);
                         });
                     });
                 });
                 path("transfers", () -> {
-                    post(TransferController.create);
+                    post(transferController::create);
                 });
             });
         });
 
-        app.exception(Exception.class, (e, ctx) -> {
+        this.javalinApp.exception(Exception.class, (e, ctx) -> {
             logger.error(e.getMessage());
             final Map<String, String> error = new HashMap<>();
             error.put("error", e.getMessage());
@@ -73,8 +97,9 @@ public class App {
 
     }
 
-    // todo API reference ?swagger (get /api)
-    // todo test coverage
+    public void stop() {
+        this.javalinApp.stop();
+    }
 
 }
 

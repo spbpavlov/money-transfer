@@ -2,41 +2,42 @@ package com.revolut.transfer.controller;
 
 import com.revolut.transfer.dto.AccountDTO;
 import com.revolut.transfer.service.AccountService;
-import io.javalin.Handler;
+import com.revolut.transfer.service.ServiceContext;
+import io.javalin.Context;
 
 import java.util.List;
 
 public class AccountController extends AbstractController {
 
-    private final static AccountService accountService;
+    private final AccountService accountService;
 
-    static {
-        accountService = serviceContext.getAccountService();
+    public AccountController(ServiceContext serviceContext) {
+        this.accountService = serviceContext.getAccountService();
     }
 
-    public static Handler getAll = ctx -> {
-        final long customerId = pathParamToLong(ctx, "customer-id");
-        final List<AccountDTO> customerAccountsDTO = accountService.findAllByCustomerId(customerId);
-        ctx.status(200).json(customerAccountsDTO);
-    };
-
-    public static Handler create = ctx -> {
+    public void create(Context ctx) {
         final AccountDTO accountDTO = ctx.bodyAsClass(AccountDTO.class);
         accountDTO.setCustomerId(ctx.pathParam("customer-id"));
-        final AccountDTO createdAccountDTO = accountService.create(accountDTO);
+        final AccountDTO createdAccountDTO = this.accountService.create(accountDTO);
         ctx.status(201).json(createdAccountDTO);
-    };
+    }
 
-    public static Handler getOne = ctx -> {
+    public void getOne(Context ctx) {
         final long accountId = pathParamToLong(ctx, "account-id");
-        final AccountDTO accountDTO = accountService.getById(accountId);
+        final AccountDTO accountDTO = this.accountService.getById(accountId);
         ctx.status(200).json(accountDTO);
-    };
+    }
 
-    public static Handler deactivate = ctx -> {
+    public void deactivate(Context ctx) {
         final long accountId = pathParamToLong(ctx, "account-id");
-        final AccountDTO deactivatedAccountDTO = accountService.deactivate(accountId);
+        final AccountDTO deactivatedAccountDTO = this.accountService.deactivate(accountId);
         ctx.status(200).json(deactivatedAccountDTO);
-    };
+    }
+
+    public void getAll(Context ctx) {
+        final long customerId = pathParamToLong(ctx, "customer-id");
+        final List<AccountDTO> customerAccountsDTO = this.accountService.findAllByCustomerId(customerId);
+        ctx.status(200).json(customerAccountsDTO);
+    }
 
 }
