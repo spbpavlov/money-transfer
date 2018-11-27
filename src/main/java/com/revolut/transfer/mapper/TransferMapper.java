@@ -1,8 +1,7 @@
 package com.revolut.transfer.mapper;
 
-import com.revolut.transfer.dto.DepositDTO;
+import com.revolut.transfer.dto.AccountOperationDTO;
 import com.revolut.transfer.dto.TransferDTO;
-import com.revolut.transfer.dto.WithdrawalDTO;
 import com.revolut.transfer.model.Currency;
 import com.revolut.transfer.model.Transfer;
 import lombok.NonNull;
@@ -73,44 +72,44 @@ final public class TransferMapper {
 
     }
 
-    public static DepositDTO transferToDepositDTO(@NonNull Transfer transfer) {
+    public static AccountOperationDTO transferToDepositAccountOperationDTO(@NonNull Transfer transfer) {
 
-        DepositDTO depositDTO = new DepositDTO();
+        AccountOperationDTO depositDTO = new AccountOperationDTO();
         depositDTO.setId(Long.toString(transfer.getId()));
         depositDTO.setExecutedTimestamp(Long.toString(transfer.getExecutedTimestamp().getTime()));
         depositDTO.setCorrespondentAccountId(Long.toString(transfer.getWithdrawalAccountId()));
-        depositDTO.setDepositAmount(AmountMapper.longToString(transfer.getDepositAmount(),
+        depositDTO.setAmount(AmountMapper.longToString(transfer.getDepositAmount(),
                 transfer.getDepositAccountCurrency()));
 
         return depositDTO;
 
     }
 
-    public static WithdrawalDTO transferToWithdrawalDTO(@NonNull Transfer transfer) {
+    public static AccountOperationDTO transferToWithdrawalAccountOperationDTO(@NonNull Transfer transfer) {
 
-        WithdrawalDTO withdrawalDTO = new WithdrawalDTO();
+        AccountOperationDTO withdrawalDTO = new AccountOperationDTO();
         withdrawalDTO.setId(Long.toString(transfer.getId()));
         withdrawalDTO.setExecutedTimestamp(Long.toString(transfer.getExecutedTimestamp().getTime()));
         withdrawalDTO.setCorrespondentAccountId(Long.toString(transfer.getDepositAccountId()));
-        withdrawalDTO.setWithdrawalAmount(AmountMapper.longToString(transfer.getWithdrawalAmount(),
+        withdrawalDTO.setAmount(AmountMapper.longToString(transfer.getWithdrawalAmount(),
                 transfer.getWithdrawalAccountCurrency()));
 
         return withdrawalDTO;
 
     }
 
-    public static List<DepositDTO> transferToDepositDTO(@NonNull List<Transfer> transfers) {
+    public static List<AccountOperationDTO> transferToDepositAccountOperationDTO(@NonNull List<Transfer> transfers) {
 
         return transfers.stream()
-                .map(TransferMapper::transferToDepositDTO)
+                .map(TransferMapper::transferToDepositAccountOperationDTO)
                 .collect(Collectors.toList());
 
     }
 
-    public static List<WithdrawalDTO> transferToWithdrawalDTO(@NonNull List<Transfer> transfers) {
+    public static List<AccountOperationDTO> transferToWithdrawalAccountOperationDTO(@NonNull List<Transfer> transfers) {
 
         return transfers.stream()
-                .map(TransferMapper::transferToWithdrawalDTO)
+                .map(TransferMapper::transferToWithdrawalAccountOperationDTO)
                 .collect(Collectors.toList());
 
     }

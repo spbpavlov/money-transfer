@@ -1,8 +1,7 @@
 package com.revolut.transfer.controller;
 
-import com.revolut.transfer.dto.DepositDTO;
+import com.revolut.transfer.dto.AccountOperationDTO;
 import com.revolut.transfer.dto.TransferDTO;
-import com.revolut.transfer.dto.WithdrawalDTO;
 import com.revolut.transfer.service.ServiceContext;
 import com.revolut.transfer.service.TransferService;
 import io.javalin.Context;
@@ -28,7 +27,7 @@ public class TransferController extends AbstractController {
         final long accountId = pathParamToLong(ctx, "account-id");
         final Timestamp start = queryParamToTimestamp(ctx, "start");
         final Timestamp end = queryParamToTimestamp(ctx, "end");
-        final List<DepositDTO> depositsDTO = transferService.getDeposits(accountId, start, end);
+        final List<AccountOperationDTO> depositsDTO = transferService.getDeposits(accountId, start, end);
         ctx.status(200).json(depositsDTO);
     }
 
@@ -36,7 +35,7 @@ public class TransferController extends AbstractController {
         final long accountId = pathParamToLong(ctx, "account-id");
         final Timestamp start = queryParamToTimestamp(ctx, "start");
         final Timestamp end = queryParamToTimestamp(ctx, "end");
-        final List<WithdrawalDTO> withdrawalsDTO = transferService.getWithdrawals(accountId, start, end);
+        final List<AccountOperationDTO> withdrawalsDTO = transferService.getWithdrawals(accountId, start, end);
         ctx.status(200).json(withdrawalsDTO);
     }
 

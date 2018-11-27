@@ -1,8 +1,7 @@
 package com.revolut.transfer.service.impl;
 
-import com.revolut.transfer.dto.DepositDTO;
+import com.revolut.transfer.dto.AccountOperationDTO;
 import com.revolut.transfer.dto.TransferDTO;
-import com.revolut.transfer.dto.WithdrawalDTO;
 import com.revolut.transfer.mapper.TransferMapper;
 import com.revolut.transfer.model.Account;
 import com.revolut.transfer.model.Transfer;
@@ -65,7 +64,7 @@ class TransferServiceImpl implements TransferService {
     }
 
     @Override
-    public List<DepositDTO> getDeposits(long accountId, Timestamp start, Timestamp end) {
+    public List<AccountOperationDTO> getDeposits(long accountId, Timestamp start, Timestamp end) {
 
         try (final RepositoryManager repositoryManager =
                      repositoryManagerFactory.getRepositoryManager(TRANSACTION_READ_COMMITTED)) {
@@ -79,13 +78,13 @@ class TransferServiceImpl implements TransferService {
                     findDepositByAccountId(accountId, start, end);
             deposits.forEach(transfer -> transfer.setDepositAccountCurrency(account.getCurrency()));
 
-            return TransferMapper.transferToDepositDTO(deposits);
+            return TransferMapper.transferToDepositAccountOperationDTO(deposits);
         }
 
     }
 
     @Override
-    public List<WithdrawalDTO> getWithdrawals(long accountId, Timestamp start, Timestamp end) {
+    public List<AccountOperationDTO> getWithdrawals(long accountId, Timestamp start, Timestamp end) {
 
         try (final RepositoryManager repositoryManager =
                      repositoryManagerFactory.getRepositoryManager(TRANSACTION_READ_COMMITTED)) {
@@ -98,7 +97,7 @@ class TransferServiceImpl implements TransferService {
             final List<Transfer> withdrawals = transferRepository.
                     findWithdrawalByAccountId(accountId,  start, end);
             withdrawals.forEach(transfer -> transfer.setWithdrawalAccountCurrency(account.getCurrency()));
-            return TransferMapper.transferToWithdrawalDTO(withdrawals);
+            return TransferMapper.transferToWithdrawalAccountOperationDTO(withdrawals);
         }
 
     }
