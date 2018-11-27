@@ -14,6 +14,8 @@ import com.revolut.transfer.service.TransferService;
 import lombok.NonNull;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -44,9 +46,12 @@ class TransferServiceImpl implements TransferService {
 
             final AccountRepository accountRepository = repositoryManager.getAccountRepository();
 
-            final List<Account> accounts = accountRepository.findAllById(
-                    asList(transfer.getWithdrawalAccountId(), transfer.getDepositAccountId()),
-                    true);
+            final List<Long> accountIdList = asList(transfer.getWithdrawalAccountId(), transfer.getDepositAccountId());
+            Collections.sort(accountIdList); // sorting prevents possible deadlocks
+            final List<Account> accounts = new ArrayList<>();
+            for (Long accountId : accountIdList) {
+                accounts.add(accountRepository.lockAndGetById(accountId));
+            }
             mapAccounts(transfer, accounts);
             validateTransfer(transfer);
 
@@ -70,7 +75,7 @@ class TransferServiceImpl implements TransferService {
                      repositoryManagerFactory.getRepositoryManager(TRANSACTION_READ_COMMITTED)) {
 
             final AccountRepository accountRepository = repositoryManager.getAccountRepository();
-            final Account account = accountRepository.findById(accountId, false);
+            final Account account = accountRepository.getById(accountId);
             validateAccount(account, accountId,false);
 
             final TransferRepository transferRepository = repositoryManager.getTransferRepository();
@@ -90,7 +95,7 @@ class TransferServiceImpl implements TransferService {
                      repositoryManagerFactory.getRepositoryManager(TRANSACTION_READ_COMMITTED)) {
 
             final AccountRepository accountRepository = repositoryManager.getAccountRepository();
-            final Account account = accountRepository.findById(accountId, false);
+            final Account account = accountRepository.getById(accountId);
             validateAccount(account, accountId, false);
 
             final TransferRepository transferRepository = repositoryManager.getTransferRepository();

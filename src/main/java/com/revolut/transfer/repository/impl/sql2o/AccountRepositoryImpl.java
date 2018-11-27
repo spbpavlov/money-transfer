@@ -63,16 +63,15 @@ class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public Account findById(long var1, boolean forUpdate) {
+    public Account getById(long accountId) {
 
         final String sql =
                 "SELECT id, customerId, currency, balance, active " +
                         "FROM account " +
-                        "WHERE id = :id " +
-                        (forUpdate ? "FOR UPDATE " : "");
+                        "WHERE id = :id ";
 
         final List<Account> accountList = con.createQuery(sql)
-                .addParameter("id", var1)
+                .addParameter("id", accountId)
                 .executeAndFetch(Account.class);
 
         if (accountList.isEmpty()) {
@@ -84,17 +83,23 @@ class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public List<Account> findAllById(Iterable<Long> var1, boolean forUpdate) {
+    public Account lockAndGetById(long accountId) {
 
         final String sql =
                 "SELECT id, customerId, currency, balance, active " +
                         "FROM account " +
-                        "WHERE id IN (:id) " +
-                        (forUpdate ? "FOR UPDATE " : "");
+                        "WHERE id = :id " +
+                        "FOR UPDATE ";
 
-        return con.createQuery(sql)
-                .addParameter("id", var1)
+        final List<Account> accountList = con.createQuery(sql)
+                .addParameter("id", accountId)
                 .executeAndFetch(Account.class);
+
+        if (accountList.isEmpty()) {
+            return null;
+        } else {
+            return accountList.get(0);
+        }
 
     }
 

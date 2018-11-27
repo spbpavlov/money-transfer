@@ -1,7 +1,6 @@
 package com.revolut.transfer.service;
 
 import com.revolut.transfer.dto.AccountDTO;
-import com.revolut.transfer.dto.TransferDTO;
 
 import java.util.List;
 
@@ -11,7 +10,7 @@ public interface AccountService {
 
     AccountDTO create(AccountDTO account);
 
-    AccountDTO findById(long accountId);
+    AccountDTO getById(long accountId);
 
     AccountDTO deactivate(long accountId);
 

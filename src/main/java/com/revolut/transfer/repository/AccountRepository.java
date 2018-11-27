@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface AccountRepository {
 
-    Account findById(long var1, boolean forUpdate);
+    Account getById(long accountId);
 
-    List<Account> findAllById(Iterable<Long> var1, boolean forUpdate);
+    Account lockAndGetById(long accountId);
 
     List<Account> findAllByCustomerId(long customerId, boolean forUpdate);
 

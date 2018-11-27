@@ -29,7 +29,7 @@ public class AccountController extends AbstractController {
 
     public static Handler getOne = ctx -> {
         final long accountId = pathParamToLong(ctx, "account-id");
-        final AccountDTO accountDTO = accountService.findById(accountId);
+        final AccountDTO accountDTO = accountService.getById(accountId);
         ctx.status(200).json(accountDTO);
     };
 

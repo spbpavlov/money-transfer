@@ -52,12 +52,12 @@ class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountDTO findById(long accountId) {
+    public AccountDTO getById(long accountId) {
         try (final RepositoryManager repositoryManager =
                      repositoryManagerFactory.getRepositoryManager(TRANSACTION_READ_COMMITTED)) {
 
             final AccountRepository accountRepository = repositoryManager.getAccountRepository();
-            final Account account = accountRepository.findById(accountId, false);
+            final Account account = accountRepository.getById(accountId);
 
             if (Objects.isNull(account)) {
                 throw new NoSuchElementException(
@@ -78,7 +78,7 @@ class AccountServiceImpl implements AccountService {
                      repositoryManagerFactory.getRepositoryManager(TRANSACTION_READ_COMMITTED)) {
 
             final AccountRepository accountRepository = repositoryManager.getAccountRepository();
-            final Account account = accountRepository.findById(accountId, true);
+            final Account account = accountRepository.lockAndGetById(accountId);
             validateAccount(account, accountId);
 
             if (!account.isActive()) {
