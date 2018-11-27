@@ -47,7 +47,7 @@ public class App {
 
     }
 
-    private void setServiceContext(ServiceContext serviceContext) {
+    public void setServiceContext(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
     }
 
