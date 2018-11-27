@@ -26,7 +26,3 @@ CREATE INDEX withdraw_idx
 
 CREATE INDEX deposit_idx
   ON transfer (depositAccountId, executedTimestamp);
-
-INSERT INTO account (customerId, currency, balance, active) VALUES (1, 'USD', 100000, TRUE);
-INSERT INTO account (customerId, currency, balance, active) VALUES (1, 'RUB', 500000, TRUE);
-INSERT INTO account (customerId, currency, balance, active) VALUES (1, 'BTC', 700000, TRUE);
