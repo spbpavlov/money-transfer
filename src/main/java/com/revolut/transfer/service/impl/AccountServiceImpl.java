@@ -7,6 +7,7 @@ import com.revolut.transfer.repository.AccountRepository;
 import com.revolut.transfer.repository.RepositoryManager;
 import com.revolut.transfer.repository.RepositoryManagerFactory;
 import com.revolut.transfer.service.AccountService;
+import com.revolut.transfer.validator.AccountValidator;
 import lombok.NonNull;
 
 import java.util.List;
@@ -79,12 +80,7 @@ class AccountServiceImpl implements AccountService {
 
             final AccountRepository accountRepository = repositoryManager.getAccountRepository();
             final Account account = accountRepository.lockAndGetById(accountId);
-            validateAccount(account, accountId);
-
-            if (!account.isActive()) {
-                throw new IllegalStateException(
-                        String.format("Account '%s' already been deactivated", account.getId()));
-            }
+            AccountValidator.validateAccount(account, accountId, true);
 
             if (account.getBalance() > 0) {
                 throw new IllegalStateException(
@@ -97,15 +93,6 @@ class AccountServiceImpl implements AccountService {
 
             return deactivatedAccountDTO;
         }
-    }
-
-    private void validateAccount(Account account, long accountId) {
-
-        if (Objects.isNull(account)) {
-            throw new IllegalStateException(
-                    String.format("Unknown account '%s'", accountId));
-        }
-
     }
 
 }
