@@ -3,7 +3,7 @@
 Design comments:
 - To run tests please use "runTest.sh"
 - To run app please use "runApp.sh"
-- After app running API specification is available at localhost:7000/spec
+- When the app is running API specification is available at localhost:7000/spec
 - Balance is holding in cents in "long"-type (for the performance purposes) and is represented at DTO as "String"-type
 - Lombok is used for getters/setters generation
 
