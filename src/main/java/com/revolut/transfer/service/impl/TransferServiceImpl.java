@@ -48,8 +48,7 @@ class TransferServiceImpl implements TransferService {
                     asList(transfer.getWithdrawalAccountId(), transfer.getDepositAccountId()),
                     true);
             mapAccounts(transfer, accounts);
-            validateTransferAccounts(transfer);
-            validateWithdrawPossibility(transfer.getWithdrawalAccount(), transfer.getWithdrawalAmount());
+            validateTransfer(transfer);
 
             accountRepository.withdraw(transfer.getWithdrawalAccount(), transfer.getWithdrawalAmount());
             accountRepository.deposit(transfer.getDepositAccount(), transfer.getDepositAmount());
@@ -115,7 +114,7 @@ class TransferServiceImpl implements TransferService {
 
     }
 
-    private void validateTransferAccounts(Transfer transfer) {
+    private void validateTransfer(Transfer transfer) {
 
         validateAccount(transfer.getWithdrawalAccount(), transfer.getWithdrawalAccountId(), true);
         validateAccount(transfer.getDepositAccount(), transfer.getDepositAccountId(), true);
@@ -134,6 +133,12 @@ class TransferServiceImpl implements TransferService {
                             transfer.getDepositAccount().getCurrency()));
         }
 
+        if (transfer.getWithdrawalAccount().getBalance() - transfer.getWithdrawalAmount() < 0) {
+            throw new IllegalStateException(
+                    String.format("Not enough money for account '%s' withdrawal",
+                            transfer.getWithdrawalAccount().getId()));
+        }
+
     }
 
     private void validateAccount(Account account, long accountId, boolean mustBeActive) {
@@ -146,16 +151,6 @@ class TransferServiceImpl implements TransferService {
         if (mustBeActive && !account.isActive()) {
             throw new IllegalStateException(
                     String.format("Account '%s' is deactivated", account.getId()));
-        }
-
-    }
-
-    private void validateWithdrawPossibility(Account withdrawalAccount, long amount) {
-
-        if (withdrawalAccount.getBalance() - amount < 0) {
-            throw new IllegalStateException(
-                    String.format("Not enough money for account '%s' withdrawal",
-                            withdrawalAccount.getId()));
         }
 
     }
