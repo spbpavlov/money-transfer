@@ -107,7 +107,9 @@ class TransferServiceImpl implements TransferService {
         for (Account account : accounts) {
             if (account.getId() ==  transfer.getWithdrawalAccountId()) {
                 transfer.setWithdrawalAccount(account);
-            } else if (account.getId() ==  transfer.getDepositAccountId()) {
+            }
+            // not else cause withdrawalAccountId could be equal depositAccountId
+            if (account.getId() ==  transfer.getDepositAccountId()) {
                 transfer.setDepositAccount(account);
             }
         }
