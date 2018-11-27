@@ -65,13 +65,14 @@ public class AppTest {
             st.executeUpdate("DELETE FROM transfer");
             st.executeUpdate("DELETE FROM account");
 
-            st.executeUpdate("ALTER SEQUENCE transfer_seq RESTART WITH 1");
-            st.executeUpdate("ALTER SEQUENCE account_seq RESTART WITH 1");
+            st.executeUpdate("INSERT INTO account (id, customerId, currency, balance, active) VALUES " +
+                    "(1, 1, 'USD', 100000, TRUE), " +
+                    "(2, 1, 'RUB', 500000, TRUE), " +
+                    "(3, 1, 'BTC', 0, TRUE), " +
+                    "(4, 2, 'BTC', 0, FALSE)");
 
-            st.executeUpdate("INSERT INTO account (customerId, currency, balance, active) VALUES " +
-                    "(1, 'USD', 100000, TRUE), " +
-                    "(1, 'RUB', 500000, TRUE), " +
-                    "(1, 'BTC', 0, TRUE)");
+            st.executeUpdate("ALTER SEQUENCE transfer_seq RESTART WITH 1");
+            st.executeUpdate("ALTER SEQUENCE account_seq RESTART WITH 5");
 
         }
 
@@ -265,7 +266,7 @@ public class AppTest {
         final AccountDTO createdAccountDTO = mapper.readValue(
                 createdJsonResponse.getBody().toString(), AccountDTO.class);
 
-        assertEquals("4", createdAccountDTO.getId());
+        assertEquals("5", createdAccountDTO.getId());
         assertEquals(customerId, createdAccountDTO.getCustomerId());
         assertEquals(accountToCreateDTO.getCurrency(), createdAccountDTO.getCurrency());
         assertEquals("234.50", createdAccountDTO.getBalance());
@@ -332,6 +333,63 @@ public class AppTest {
         transferToCreateDTO.setWithdrawalAccountId("1");
         transferToCreateDTO.setWithdrawalAccountCurrency("USD");
         transferToCreateDTO.setWithdrawalAmount("15.123");
+        transferToCreateDTO.setDepositAccountId("2");
+        transferToCreateDTO.setDepositAccountCurrency("RUB");
+        transferToCreateDTO.setDepositAmount("1003.9");
+
+        final HttpResponse<JsonNode> createdJsonResponse = Unirest.post(getApiURI() + "/transfers")
+                .body(mapper.writeValueAsString(transferToCreateDTO))
+                .asJson();
+
+        assertEquals(400, createdJsonResponse.getStatus());
+
+    }
+
+    @Test
+    public void createTransferNotEnouthMoneyTest() throws UnirestException, IOException {
+
+        final TransferDTO transferToCreateDTO = new TransferDTO();
+        transferToCreateDTO.setWithdrawalAccountId("3");
+        transferToCreateDTO.setWithdrawalAccountCurrency("BTC");
+        transferToCreateDTO.setWithdrawalAmount("1");
+        transferToCreateDTO.setDepositAccountId("2");
+        transferToCreateDTO.setDepositAccountCurrency("RUB");
+        transferToCreateDTO.setDepositAmount("200000");
+
+        final HttpResponse<JsonNode> createdJsonResponse = Unirest.post(getApiURI() + "/transfers")
+                .body(mapper.writeValueAsString(transferToCreateDTO))
+                .asJson();
+
+        assertEquals(400, createdJsonResponse.getStatus());
+
+    }
+
+    @Test
+    public void createTransferDeactivatedAccountTest() throws UnirestException, IOException {
+
+        final TransferDTO transferToCreateDTO = new TransferDTO();
+        transferToCreateDTO.setWithdrawalAccountId("4");
+        transferToCreateDTO.setWithdrawalAccountCurrency("BTC");
+        transferToCreateDTO.setWithdrawalAmount("1");
+        transferToCreateDTO.setDepositAccountId("2");
+        transferToCreateDTO.setDepositAccountCurrency("RUB");
+        transferToCreateDTO.setDepositAmount("200000");
+
+        final HttpResponse<JsonNode> createdJsonResponse = Unirest.post(getApiURI() + "/transfers")
+                .body(mapper.writeValueAsString(transferToCreateDTO))
+                .asJson();
+
+        assertEquals(400, createdJsonResponse.getStatus());
+
+    }
+
+    @Test
+    public void createTransferWrongCurrencyTest() throws UnirestException, IOException {
+
+        final TransferDTO transferToCreateDTO = new TransferDTO();
+        transferToCreateDTO.setWithdrawalAccountId("1");
+        transferToCreateDTO.setWithdrawalAccountCurrency("RUB");
+        transferToCreateDTO.setWithdrawalAmount("15.1");
         transferToCreateDTO.setDepositAccountId("2");
         transferToCreateDTO.setDepositAccountCurrency("RUB");
         transferToCreateDTO.setDepositAmount("1003.9");
