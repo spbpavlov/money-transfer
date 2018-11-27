@@ -15,7 +15,7 @@ final public class AccountValidator {
         }
 
         if (mustBeActive && !account.isActive()) {
-            throw new NoSuchElementException(
+            throw new IllegalStateException(
                     String.format("Account '%s' is deactivated", account.getId()));
         }
 
