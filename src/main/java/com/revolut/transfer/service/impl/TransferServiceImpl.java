@@ -43,7 +43,7 @@ class TransferServiceImpl implements TransferService {
 
             final List<Long> accountIdList = asList(transfer.getWithdrawalAccountId(), transfer.getDepositAccountId());
             Collections.sort(accountIdList); // sorting prevents possible deadlocks
-            final List<Account> accounts = new ArrayList<>();
+            final List<Account> accounts = new ArrayList<>(2);
             for (Long accountId : accountIdList) {
                 accounts.add(accountRepository.lockAndGetById(accountId));
             }
