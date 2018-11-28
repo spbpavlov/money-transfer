@@ -10,7 +10,7 @@ public interface AccountRepository {
 
     Account lockAndGetById(long accountId);
 
-    List<Account> findAllByCustomerId(long customerId, boolean forUpdate);
+    List<Account> findAllByCustomerId(long customerId);
 
     Account create(Account account);
 

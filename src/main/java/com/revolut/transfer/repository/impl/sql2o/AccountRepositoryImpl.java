@@ -16,13 +16,12 @@ class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public List<Account> findAllByCustomerId(long customerId, boolean forUpdate) {
+    public List<Account> findAllByCustomerId(long customerId) {
 
         final String sql =
                 "SELECT id, customerId, currency, balance, active " +
                         "FROM account " +
-                        "WHERE customerId = :customerId " +
-                        (forUpdate ? "FOR UPDATE " : "");
+                        "WHERE customerId = :customerId ";
 
         return con.createQuery(sql)
                 .addParameter("customerId", customerId)

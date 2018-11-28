@@ -29,7 +29,7 @@ class AccountServiceImpl implements AccountService {
         try (final RepositoryManager repositoryManager =
                      repositoryManagerFactory.getRepositoryManager(TRANSACTION_READ_COMMITTED)) {
             final AccountRepository accountRepository = repositoryManager.getAccountRepository();
-            final List<Account> accounts = accountRepository.findAllByCustomerId(customerId, false);
+            final List<Account> accounts = accountRepository.findAllByCustomerId(customerId);
             return AccountMapper.accountToAccountDTO(accounts);
         }
     }
