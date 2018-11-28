@@ -37,14 +37,13 @@ public class AppTest {
 
     @BeforeClass
     public static void setUp() {
-        app = new App(PORT);
 
+        app = new App(PORT);
         final RepositoryManagerFactory repositoryManagerFactory
                 = new RepositoryManagerFactoryImpl(DataSourceTestFactory.getDataSource());
         final ServiceContext serviceContext = new ServiceContextImpl(repositoryManagerFactory);
+        app.initRoutes(serviceContext);
 
-        app.setServiceContext(serviceContext);
-        app.initRoutes();
     }
 
     @AfterClass

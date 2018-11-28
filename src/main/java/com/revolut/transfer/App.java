@@ -24,18 +24,17 @@ import static io.javalin.apibuilder.ApiBuilder.post;
 public class App {
 
     private static Logger logger = LoggerFactory.getLogger(App.class);
-    private ServiceContext serviceContext;
 
     private final Javalin javalinApp;
 
     public static void main(String[] args) {
-        final App app = new App(7000);
 
+        final App app = new App(7000);
         final RepositoryManagerFactory repositoryManagerFactory
                 = new RepositoryManagerFactoryImpl(DataSourceFactory.getDataSource());
         final ServiceContext serviceContext = new ServiceContextImpl(repositoryManagerFactory);
-        app.setServiceContext(serviceContext);
-        app.initRoutes();
+        app.initRoutes(serviceContext);
+
     }
 
     public App (int port) {
@@ -47,11 +46,7 @@ public class App {
 
     }
 
-    public void setServiceContext(ServiceContext serviceContext) {
-        this.serviceContext = serviceContext;
-    }
-
-    public void initRoutes() {
+    public void initRoutes(ServiceContext serviceContext) {
 
         final SwaggerRenderer swaggerRenderer = new SwaggerRenderer("swagger.yaml");
         final AccountController accountController = new AccountController(serviceContext);
